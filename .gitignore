@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+apps/api/dist/
+coverage/
+
+# Prisma generated client (created by npm run db:generate)
+apps/api/src/generated/prisma/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Taro / WeChat DevTools temp files
+apps/miniprogram/.temp/
+*.log
+
+# Editor & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,26 @@
+{
+  "name": "home-pantry",
+  "private": true,
+  "version": "0.1.0",
+  "description": "今天吃啥 - 智能家庭食材库存与菜谱推荐小程序",
+  "workspaces": [
+    "apps/miniprogram",
+    "apps/api"
+  ],
+  "scripts": {
+    "dev:mini": "npm run dev:weapp -w @home-pantry/miniprogram",
+    "build:mini": "npm run build:weapp -w @home-pantry/miniprogram",
+    "dev:api": "npm run start:dev -w @home-pantry/api",
+    "build:api": "npm run build -w @home-pantry/api",
+    "build": "npm run build:api && npm run build:mini",
+    "db:generate": "npm run prisma:generate -w @home-pantry/api",
+    "db:migrate": "npm run prisma:migrate -w @home-pantry/api --",
+    "db:seed": "npm run prisma:seed -w @home-pantry/api",
+    "db:studio": "npm run prisma:studio -w @home-pantry/api"
+  },
+  "engines": {
+    "node": ">=26.13.1 <27",
+    "npm": ">=11.20.0 <12"
+  },
+  "packageManager": "npm@11.20.0"
+}

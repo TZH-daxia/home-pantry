@@ -1,0 +1,226 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum HouseholdRole {
+  OWNER
+  MEMBER
+}
+
+enum IngredientKind {
+  REQUIRED
+  OPTIONAL
+}
+
+model User {
+  id                String              @id @default(cuid())
+  openid            String              @unique
+  unionid           String?
+  nickname          String              @default("小厨房主人")
+  avatarKey         String              @default("sunflower") @map("avatar_key")
+  status            String              @default("ACTIVE")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  memberships       HouseholdMember[]
+  mealHistory       MealHistory[]
+  notificationLogs  NotificationLog[]
+
+  @@map("users")
+}
+
+model Household {
+  id                    String                 @id @default(cuid())
+  name                  String                 @default("我的家")
+  createdBy             String                 @map("created_by")
+  timezone              String                 @default("Asia/Shanghai")
+  createdAt             DateTime               @default(now()) @map("created_at")
+  updatedAt             DateTime               @updatedAt @map("updated_at")
+  members               HouseholdMember[]
+  inventoryItems        InventoryItem[]
+  recipes               Recipe[]
+  mealHistory           MealHistory[]
+  recommendationBatches RecommendationBatch[]
+  notificationSettings  NotificationSetting?
+
+  @@map("households")
+}
+
+model HouseholdMember {
+  id          String        @id @default(cuid())
+  householdId String        @map("household_id")
+  userId      String        @map("user_id")
+  role        HouseholdRole @default(MEMBER)
+  joinedAt    DateTime      @default(now()) @map("joined_at")
+  household   Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([householdId, userId])
+  @@index([userId])
+  @@map("household_members")
+}
+
+model IngredientCategory {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  sortOrder   Int          @default(0) @map("sort_order")
+  ingredients Ingredient[]
+
+  @@map("ingredient_categories")
+}
+
+model Ingredient {
+  id           String               @id @default(cuid())
+  name         String               @unique
+  categoryId   String               @map("category_id")
+  defaultUnit  String               @default("个") @map("default_unit")
+  emoji        String               @default("🥬")
+  category     IngredientCategory   @relation(fields: [categoryId], references: [id])
+  inventory    InventoryItem[]
+  recipeLinks  RecipeIngredient[]
+  createdAt    DateTime             @default(now()) @map("created_at")
+
+  @@index([categoryId])
+  @@map("ingredients")
+}
+
+model InventoryItem {
+  id          String     @id @default(cuid())
+  householdId String     @map("household_id")
+  ingredientId String    @map("ingredient_id")
+  quantity    Float
+  unit        String
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+  household   Household  @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  ingredient  Ingredient @relation(fields: [ingredientId], references: [id])
+
+  @@unique([householdId, ingredientId, unit])
+  @@index([householdId])
+  @@map("inventory_items")
+}
+
+model Recipe {
+  id           String               @id @default(cuid())
+  householdId  String?              @map("household_id")
+  name         String
+  description  String               @default("")
+  difficulty   Int                  @default(1)
+  prepMinutes  Int                  @default(0) @map("prep_minutes")
+  cookMinutes  Int                  @default(0) @map("cook_minutes")
+  emoji        String               @default("🍳")
+  theme        String               @default("custom")
+  isSystem     Boolean              @default(false) @map("is_system")
+  createdAt    DateTime             @default(now()) @map("created_at")
+  updatedAt    DateTime             @updatedAt @map("updated_at")
+  household    Household?           @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  ingredients  RecipeIngredient[]
+  steps        RecipeStep[]
+  mealHistory  MealHistory[]
+  recommended  RecommendationItem[]
+
+  @@index([householdId])
+  @@map("recipes")
+}
+
+model RecipeIngredient {
+  id           String         @id @default(cuid())
+  recipeId     String         @map("recipe_id")
+  ingredientId String         @map("ingredient_id")
+  kind         IngredientKind @default(REQUIRED)
+  amount       Float          @default(1)
+  unit         String
+  sortOrder    Int            @default(0) @map("sort_order")
+  recipe       Recipe         @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient     @relation(fields: [ingredientId], references: [id])
+
+  @@unique([recipeId, ingredientId, kind])
+  @@index([ingredientId])
+  @@map("recipe_ingredients")
+}
+
+model RecipeStep {
+  id          String   @id @default(cuid())
+  recipeId    String   @map("recipe_id")
+  stepNumber  Int      @map("step_number")
+  instruction String
+  recipe      Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([recipeId, stepNumber])
+  @@map("recipe_steps")
+}
+
+model MealHistory {
+  id          String    @id @default(cuid())
+  householdId String    @map("household_id")
+  userId      String?   @map("user_id")
+  recipeId    String    @map("recipe_id")
+  cookedAt    DateTime  @default(now()) @map("cooked_at")
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  user        User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  recipe      Recipe    @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@index([householdId, cookedAt])
+  @@map("meal_history")
+}
+
+model RecommendationBatch {
+  id                 String               @id @default(cuid())
+  householdId        String               @map("household_id")
+  recommendationDate DateTime             @db.Date @map("recommendation_date")
+  algorithmVersion   String               @default("inventory-v1") @map("algorithm_version")
+  generatedAt        DateTime             @default(now()) @map("generated_at")
+  household          Household            @relation(fields: [householdId], references: [id], onDelete: Cascade)
+  items              RecommendationItem[]
+
+  @@unique([householdId, recommendationDate])
+  @@map("recommendation_batches")
+}
+
+model RecommendationItem {
+  id             String              @id @default(cuid())
+  batchId        String              @map("batch_id")
+  recipeId       String              @map("recipe_id")
+  rank           Int
+  matchLevel     Int                 @map("match_level")
+  score          Float
+  matchSnapshot  Json                @map("match_snapshot")
+  batch          RecommendationBatch @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  recipe         Recipe              @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([batchId, recipeId])
+  @@index([batchId, rank])
+  @@map("recommendation_items")
+}
+
+model NotificationSetting {
+  id              String    @id @default(cuid())
+  householdId     String    @unique @map("household_id")
+  enabled         Boolean   @default(true)
+  mode            String    @default("AUTO")
+  preferredTime   String    @default("08:00") @map("preferred_time")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  household       Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@map("notification_settings")
+}
+
+model NotificationLog {
+  id          String    @id @default(cuid())
+  userId      String    @map("user_id")
+  batchId     String?   @map("batch_id")
+  templateId  String?   @map("template_id")
+  status      String    @default("PENDING")
+  error       String?
+  sentAt      DateTime? @map("sent_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@map("notification_logs")
+}
