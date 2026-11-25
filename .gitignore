@@ -16,6 +16,7 @@ apps/api/src/generated/prisma/
 
 # Taro / WeChat DevTools temp files
 apps/miniprogram/.temp/
+apps/miniprogram/.swc/
 *.log
 
 # Editor & OS files
