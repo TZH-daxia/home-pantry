@@ -1,11 +1,17 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common'
 import { PrismaService } from '../../common/prisma/prisma.service'
+import { toKindDb, toRecipeShape } from './recipe.mapper'
 
-interface IngredientInput { ingredientName: string; kind: 'REQUIRED' | 'OPTIONAL'; amount: number; unit: string; categoryName?: string }
-interface CreateRecipeInput {
+export interface IngredientInput { ingredientName: string; kind: string; amount: number; unit: string; categoryName?: string }
+export interface CreateRecipeInput {
   householdId: string; name: string; description?: string; difficulty: number; prepMinutes?: number; cookMinutes?: number
   emoji?: string; theme?: string; ingredients: IngredientInput[]; steps?: { instruction: string }[]
 }
+
+const recipeInclude = {
+  ingredients: { include: { ingredient: true }, orderBy: { sortOrder: 'asc' } },
+  steps: { orderBy: { stepNumber: 'asc' } },
+} as const
 
 @Injectable()
 export class RecipesService {
@@ -18,17 +24,18 @@ export class RecipesService {
 
   async list(householdId: string, userId: string) {
     await this.assertMember(householdId, userId)
-    return this.prisma.recipe.findMany({
+    const recipes = await this.prisma.recipe.findMany({
       where: { OR: [{ householdId }, { isSystem: true, householdId: null }] },
-      include: { ingredients: { include: { ingredient: true }, orderBy: { sortOrder: 'asc' } }, steps: { orderBy: { stepNumber: 'asc' } } },
+      include: recipeInclude,
       orderBy: [{ isSystem: 'desc' }, { name: 'asc' }],
     })
+    return recipes.map(toRecipeShape)
   }
 
   async create(input: CreateRecipeInput, userId: string) {
     await this.assertMember(input.householdId, userId)
     return this.prisma.$transaction(async (tx) => {
-      const linkedIngredients = [] as { ingredientId: string; kind: 'REQUIRED' | 'OPTIONAL'; amount: number; unit: string; sortOrder: number }[]
+      const linkedIngredients: { ingredientId: string; kind: 'REQUIRED' | 'OPTIONAL'; amount: number; unit: string; sortOrder: number }[] = []
       for (const [index, item] of input.ingredients.entries()) {
         const categoryName = item.categoryName || '其他'
         const category = await tx.ingredientCategory.upsert({ where: { name: categoryName }, update: {}, create: { name: categoryName } })
@@ -37,17 +44,18 @@ export class RecipesService {
           update: {},
           create: { name: item.ingredientName, categoryId: category.id, defaultUnit: item.unit },
         })
-        linkedIngredients.push({ ingredientId: ingredient.id, kind: item.kind, amount: item.amount, unit: item.unit, sortOrder: index })
+        linkedIngredients.push({ ingredientId: ingredient.id, kind: toKindDb(item.kind), amount: item.amount, unit: item.unit, sortOrder: index })
       }
-      return tx.recipe.create({
+      const recipe = await tx.recipe.create({
         data: {
           householdId: input.householdId, name: input.name, description: input.description || '', difficulty: input.difficulty,
           prepMinutes: input.prepMinutes || 0, cookMinutes: input.cookMinutes || 0, emoji: input.emoji || '🍳', theme: input.theme || 'custom',
           ingredients: { create: linkedIngredients },
           steps: { create: (input.steps || []).map((step, index) => ({ stepNumber: index + 1, instruction: step.instruction })) },
         },
-        include: { ingredients: { include: { ingredient: true } }, steps: true },
+        include: recipeInclude,
       })
+      return toRecipeShape(recipe)
     })
   }
 

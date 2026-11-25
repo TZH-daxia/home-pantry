@@ -103,7 +103,7 @@ export const INITIAL_RECIPES: Recipe[] = [
 ]
 
 export const INITIAL_PROFILE: UserProfile = {
-  nickname: '小厨房主人', avatar: '🌻', autoRecommend: true, notifyMode: 'auto', recommendTime: '08:00',
+  nickname: '小厨房主人', avatar: '🌻', autoRecommend: true, notifyMode: 'auto', recommendTime: '08:00', householdRole: 'owner',
 }
 
 export const INITIAL_HISTORY: MealRecord[] = [

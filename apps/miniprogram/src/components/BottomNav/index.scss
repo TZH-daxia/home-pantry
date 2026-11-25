@@ -1,5 +1,4 @@
-.bottom-nav-wrap { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; padding: 0 28rpx calc(18rpx + env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(247,247,242,0), rgba(247,247,242,.94) 22%); }
-.bottom-nav { height: 106rpx; display: flex; align-items: center; justify-content: space-around; background: rgba(255,255,255,.96); border: 1rpx solid rgba(224,229,221,.9); border-radius: 34rpx; box-shadow: 0 12rpx 40rpx rgba(31,48,38,.10); backdrop-filter: blur(20px); }
-.nav-item { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4rpx; color: #94a097; font-size: 20rpx; font-weight: 550; }
-.nav-item.active { color: #245b45; }
-.nav-item.active .app-icon { width: 72rpx; height: 42rpx; border-radius: 99rpx; background: #e8f0e9; }
+.bottom-nav-wrap { position: fixed; z-index: 30; left: 0; right: 0; bottom: 0; padding: 10rpx 24rpx calc(10rpx + env(safe-area-inset-bottom)); background: #fff; border-top: 1rpx solid #e8ebe4; box-shadow: 0 -10rpx 30rpx rgba(31,48,38,.06); }
+.bottom-nav { height: 96rpx; display: flex; align-items: center; gap: 14rpx; }
+.nav-item { flex: 1; height: 84rpx; display: flex; flex-direction: row; align-items: center; justify-content: center; gap: 10rpx; border-radius: 22rpx; color: #8b978f; background: #f5f6f1; font-size: 23rpx; font-weight: 650; }
+.nav-item.active { color: #245b45; background: #e8f0e9; }

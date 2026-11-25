@@ -5,9 +5,14 @@ node_modules/
 dist/
 apps/api/dist/
 coverage/
+*.tsbuildinfo
 
 # Prisma generated client (created by npm run db:generate)
 apps/api/src/generated/prisma/
+
+# SQLite 数据库文件（本地开发数据，不提交）
+apps/api/prisma/*.db
+apps/api/prisma/*.db-journal
 
 # Environment variables
 .env

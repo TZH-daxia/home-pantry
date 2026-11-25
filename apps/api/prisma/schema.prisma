@@ -5,17 +5,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-}
-
-enum HouseholdRole {
-  OWNER
-  MEMBER
-}
-
-enum IngredientKind {
-  REQUIRED
-  OPTIONAL
+  provider = "sqlite"
 }
 
 model User {
@@ -25,6 +15,8 @@ model User {
   nickname          String              @default("小厨房主人")
   avatarKey         String              @default("sunflower") @map("avatar_key")
   status            String              @default("ACTIVE")
+  /** 令牌版本：退出登录时自增，使旧 JWT 立即失效 */
+  tokenVersion      Int                 @default(0) @map("token_version")
   createdAt         DateTime            @default(now()) @map("created_at")
   updatedAt         DateTime            @updatedAt @map("updated_at")
   memberships       HouseholdMember[]
@@ -47,15 +39,29 @@ model Household {
   mealHistory           MealHistory[]
   recommendationBatches RecommendationBatch[]
   notificationSettings  NotificationSetting?
+  invites               HouseholdInvite[]
 
   @@map("households")
+}
+
+model HouseholdInvite {
+  id          String    @id @default(cuid())
+  code        String    @unique
+  householdId String    @map("household_id")
+  createdBy   String    @map("created_by")
+  expiresAt   DateTime  @map("expires_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  household   Household @relation(fields: [householdId], references: [id], onDelete: Cascade)
+
+  @@index([householdId])
+  @@map("household_invites")
 }
 
 model HouseholdMember {
   id          String        @id @default(cuid())
   householdId String        @map("household_id")
   userId      String        @map("user_id")
-  role        HouseholdRole @default(MEMBER)
+  role        String        @default("MEMBER")
   joinedAt    DateTime      @default(now()) @map("joined_at")
   household   Household     @relation(fields: [householdId], references: [id], onDelete: Cascade)
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -132,7 +138,7 @@ model RecipeIngredient {
   id           String         @id @default(cuid())
   recipeId     String         @map("recipe_id")
   ingredientId String         @map("ingredient_id")
-  kind         IngredientKind @default(REQUIRED)
+  kind         String         @default("REQUIRED")
   amount       Float          @default(1)
   unit         String
   sortOrder    Int            @default(0) @map("sort_order")
@@ -172,7 +178,7 @@ model MealHistory {
 model RecommendationBatch {
   id                 String               @id @default(cuid())
   householdId        String               @map("household_id")
-  recommendationDate DateTime             @db.Date @map("recommendation_date")
+  recommendationDate DateTime             @map("recommendation_date")
   algorithmVersion   String               @default("inventory-v1") @map("algorithm_version")
   generatedAt        DateTime             @default(now()) @map("generated_at")
   household          Household            @relation(fields: [householdId], references: [id], onDelete: Cascade)

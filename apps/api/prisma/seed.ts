@@ -1,12 +1,11 @@
 import { config } from 'dotenv'
 import { resolve } from 'path'
 config({ path: resolve(__dirname, '../../../.env') })
-import { PrismaPg } from '@prisma/adapter-pg'
+import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3'
 import { PrismaClient } from '../src/generated/prisma/client'
+import { resolveDatabaseUrl } from '../src/common/prisma/database-url'
 
-const connectionString = process.env.DATABASE_URL
-if (!connectionString) throw new Error('DATABASE_URL is required')
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString }) })
+const prisma = new PrismaClient({ adapter: new PrismaBetterSqlite3({ url: resolveDatabaseUrl() }) })
 
 async function main() {
   const user = await prisma.user.upsert({
@@ -64,9 +63,9 @@ async function main() {
   for (const item of recipes) {
     const exists = await prisma.recipe.findFirst({ where: { name: item.name, householdId: household.id } })
     if (exists) continue
-    const all = [
-      ...item.required.map(([name, amount, unit]) => ({ name, amount, unit, kind: 'REQUIRED' as const })),
-      ...item.optional.map(([name, amount, unit]) => ({ name, amount, unit, kind: 'OPTIONAL' as const })),
+    const all: { name: string; amount: number; unit: string; kind: 'REQUIRED' | 'OPTIONAL' }[] = [
+      ...item.required.map((entry) => ({ name: entry[0], amount: entry[1], unit: entry[2], kind: 'REQUIRED' as const })),
+      ...item.optional.map((entry) => ({ name: entry[0], amount: entry[1], unit: entry[2], kind: 'OPTIONAL' as const })),
     ]
     await prisma.recipe.create({
       data: {

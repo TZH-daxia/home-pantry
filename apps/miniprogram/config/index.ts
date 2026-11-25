@@ -16,6 +16,8 @@ export default defineConfig({
   compiler: 'webpack5',
   defineConstants: {
     'process.env.TARO_APP_API_BASE_URL': JSON.stringify(process.env.TARO_APP_API_BASE_URL || 'http://127.0.0.1:3000/api'),
+    // 纯本地演示版本：不请求后端，隐藏家庭协同入口
+    'process.env.TARO_APP_LOCAL_ONLY': JSON.stringify(process.env.TARO_APP_LOCAL_ONLY || 'false'),
   },
   cache: { enable: true },
   mini: {

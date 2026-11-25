@@ -40,6 +40,10 @@ export interface MealRecord {
   id: string
   recipeId: string
   cookedAt: string
+  /** 以下字段由后端提供，用于家庭共享展示 */
+  userName?: string
+  userAvatar?: string
+  recipeName?: string
 }
 
 export interface UserProfile {
@@ -48,6 +52,10 @@ export interface UserProfile {
   autoRecommend: boolean
   notifyMode: 'auto' | 'manual'
   recommendTime: string
+  /** 当前家庭角色：owner 表示自己的厨房（管理员），member 表示他人厨房中的成员 */
+  householdRole?: 'owner' | 'member'
+  /** 当前家庭名称（来自后端 /users/me） */
+  householdName?: string
 }
 
 export interface RecipeMatch {

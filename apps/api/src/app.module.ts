@@ -9,9 +9,10 @@ import { RecommendationsModule } from './modules/recommendations/recommendations
 import { NotificationsModule } from './modules/notifications/notifications.module'
 import { HistoryModule } from './modules/history/history.module'
 import { UsersModule } from './modules/users/users.module'
+import { HouseholdsModule } from './modules/households/households.module'
 
 @Module({
-  imports: [ScheduleModule.forRoot(), PrismaModule, AuthModule, InventoryModule, RecipesModule, RecommendationsModule, NotificationsModule, HistoryModule, UsersModule],
+  imports: [ScheduleModule.forRoot(), PrismaModule, AuthModule, InventoryModule, RecipesModule, RecommendationsModule, NotificationsModule, HistoryModule, UsersModule, HouseholdsModule],
   controllers: [AppController],
 })
 export class AppModule {}

@@ -44,7 +44,11 @@ import { PrismaClient } from '../../generated/prisma/client'
 import { PrismaClient } from '../src/generated/prisma/client'
 ```
 
-Prisma 7 使用 PostgreSQL driver adapter，项目保留 `@prisma/adapter-pg` 和 `pg`。数据库 URL 在 `apps/api/prisma.config.ts` 中从根目录 `.env` 的 `DATABASE_URL` 读取。
+Prisma 7 使用驱动适配器（driver adapter）连接数据库。项目当前使用 SQLite：`@prisma/adapter-better-sqlite3` + `better-sqlite3`，数据库文件默认位于 `apps/api/prisma/dev.db`（已加入 `.gitignore`）。
+
+- 连接地址由 `apps/api/src/common/prisma/database-url.ts` 统一解析：未配置 `DATABASE_URL` 时使用默认文件；配置为相对 `file:` 路径时按 `apps/api/prisma` 解析，保证 CLI 迁移与运行时指向同一文件。
+- `prisma.config.ts` 与 `PrismaService`、`prisma/seed.ts` 共用这套解析逻辑。
+- 迁移到服务端数据库（PostgreSQL/MySQL 等）时，替换 datasource provider 与对应适配器即可，业务代码无需改动。
 
 ## 初始化流程
 

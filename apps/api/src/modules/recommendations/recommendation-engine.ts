@@ -31,10 +31,12 @@ export interface RecommendationMatch {
 export function rankRecipes(inventory: IngredientSnapshot[], recipes: RecipeSnapshot[], recentRecipeIds: string[]): RecommendationMatch[] {
   const recentCount = new Map<string, number>()
   recentRecipeIds.forEach((id) => recentCount.set(id, (recentCount.get(id) || 0) + 1))
-  const available = (item: RecipeIngredientSnapshot) => {
-    const stock = inventory.find((entry) => entry.name === item.ingredientName)
-    return Boolean(stock && stock.unit === item.unit && stock.quantity >= item.amount)
-  }
+  /**
+   * MVP 判定规则：库存中存在同名食材即视为满足（有就算有），不比较数量与单位。
+   * 是否够用交给用户现场判断；将来开启精确库存时，再恢复 quantity / unit 比较与换算。
+   */
+  const available = (item: RecipeIngredientSnapshot) =>
+    inventory.some((entry) => entry.name === item.ingredientName)
   const recentDifficulties = recentRecipeIds
     .map((id) => recipes.find((recipe) => recipe.id === id)?.difficulty)
     .filter((value): value is number => typeof value === 'number')

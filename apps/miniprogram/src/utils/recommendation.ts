@@ -1,12 +1,12 @@
 import { Ingredient, Recipe, RecipeIngredient, RecipeMatch, MealRecord } from '../types'
 
-const canSatisfy = (recipeItem: RecipeIngredient, inventory: Ingredient[]) => {
-  const item = inventory.find((entry) => entry.name.trim() === recipeItem.ingredientName.trim())
-  if (!item) return false
-  // MVP 使用相同单位的数量比较；单位不同不冒险推断充足。后续统一接入服务端单位换算表。
-  if (item.unit !== recipeItem.unit) return false
-  return item.quantity >= recipeItem.amount
-}
+/**
+ * MVP 判定规则：库存中存在同名食材即视为满足（有就算有）。
+ * 数量与单位不参与判定——前端不维护精确库存，是否够用由用户自己判断。
+ * 后续若开启「精确库存 / 做菜扣减」，再在此处恢复数量与单位换算比较。
+ */
+const canSatisfy = (recipeItem: RecipeIngredient, inventory: Ingredient[]) =>
+  inventory.some((entry) => entry.name.trim() === recipeItem.ingredientName.trim())
 
 export function buildRecommendations(recipes: Recipe[], inventory: Ingredient[], history: MealRecord[]): RecipeMatch[] {
   const now = Date.now()

@@ -1,21 +1,6 @@
+# 数据库已切换为 SQLite（文件位于 apps/api/prisma/dev.db），本地开发不再需要 Docker 启动 Postgres。
+# 这里仅保留 Redis，供后续异步任务 / 缓存（BullMQ）启用时使用，当前可不启动。
 services:
-  postgres:
-    image: postgres:17-alpine
-    container_name: home-pantry-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: home_pantry
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - home_pantry_pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d home_pantry"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
   redis:
     image: redis:7-alpine
     container_name: home-pantry-redis
@@ -26,5 +11,4 @@ services:
     volumes:
       - home_pantry_redisdata:/data
 volumes:
-  home_pantry_pgdata:
   home_pantry_redisdata:

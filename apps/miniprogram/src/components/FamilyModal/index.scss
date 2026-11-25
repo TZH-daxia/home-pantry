@@ -1,0 +1,42 @@
+.family-modal { padding-bottom: 8rpx; }
+.family-current { display: flex; align-items: center; gap: 18rpx; padding: 22rpx; border-radius: 24rpx; background: linear-gradient(120deg, #285a43, #3f7654); color: #fff; }
+.family-current-main { flex: 1; min-width: 0; }
+.family-name { display: block; font-size: 30rpx; font-weight: 800; }
+.family-caption { display: block; margin-top: 6rpx; font-size: 19rpx; color: rgba(255,255,255,.72); }
+.family-role { flex: none; padding: 8rpx 16rpx; border-radius: 99rpx; background: rgba(255,255,255,.16); color: #f2e8d2; font-size: 19rpx; font-weight: 700; }
+.family-role.owner { background: #f4dca8; color: #6b4a15; }
+
+.family-block { margin-top: 30rpx; }
+.family-block-title { display: block; margin-bottom: 14rpx; color: #2a392f; font-size: 24rpx; font-weight: 800; }
+
+.family-member { display: flex; align-items: center; gap: 16rpx; padding: 14rpx 0; border-bottom: 1rpx solid #f1f2ee; }
+.family-member:last-child { border-bottom: 0; }
+.family-avatar { width: 64rpx; height: 64rpx; flex: none; border-radius: 20rpx; display: flex; align-items: center; justify-content: center; background: #f3f5ef; font-size: 36rpx; }
+.family-member-copy { flex: 1; min-width: 0; }
+.family-member-name { display: block; color: #29372e; font-size: 23rpx; font-weight: 750; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.family-member-role { display: block; margin-top: 4rpx; color: #929d95; font-size: 17rpx; }
+.family-remove { display: flex; align-items: center; gap: 4rpx; flex: none; padding: 8rpx 14rpx; border-radius: 99rpx; background: #fbe6e2; color: #bd5343; font-size: 18rpx; font-weight: 650; }
+
+.family-invite { padding: 20rpx; border-radius: 22rpx; background: #f7f8f4; border: 1rpx dashed #cfd8ce; }
+.family-invite-code { display: block; text-align: center; color: #245b45; font-size: 52rpx; font-weight: 800; letter-spacing: 10rpx; }
+.family-invite-actions { display: flex; align-items: center; gap: 12rpx; margin-top: 16rpx; }
+.family-share { flex: 1; height: 76rpx; line-height: 76rpx; border-radius: 20rpx; background: #245b45; color: #fff; font-size: 23rpx; font-weight: 650; text-align: center; }
+.family-share::after { border: 0; }
+.family-copy { flex: none; min-height: 76rpx; padding: 0 28rpx; }
+.family-invite-foot { display: flex; align-items: flex-start; justify-content: space-between; gap: 16rpx; margin-top: 12rpx; }
+.family-invite-foot .family-hint { flex: 1; margin-top: 0; }
+.family-action { min-height: 72rpx; }
+.family-link { flex: none; color: #245b45; font-size: 20rpx; font-weight: 650; }
+
+.family-join { display: flex; align-items: center; gap: 12rpx; }
+.family-input { flex: 1; min-height: 78rpx; padding: 0 22rpx; border-radius: 20rpx; background: #f7f8f5; border: 1rpx solid #e9ece6; font-size: 26rpx; letter-spacing: 4rpx; }
+.family-join-btn { flex: none; min-height: 78rpx; padding: 0 30rpx; }
+.family-hint { display: block; margin-top: 12rpx; color: #9aa49c; font-size: 17rpx; line-height: 1.5; }
+
+.family-switch { display: flex; align-items: center; gap: 12rpx; padding: 18rpx 20rpx; margin-bottom: 12rpx; border-radius: 20rpx; background: #fff; border: 1rpx solid #e9ece5; }
+.family-switch.active { background: #eff5ef; border-color: #c8d9ca; }
+.family-switch-main { flex: 1; min-width: 0; }
+.family-switch-name { display: block; color: #29372e; font-size: 23rpx; font-weight: 750; }
+.family-switch-meta { display: block; margin-top: 4rpx; color: #929d95; font-size: 17rpx; }
+.family-switch-tag { flex: none; color: #2d6245; font-size: 18rpx; font-weight: 700; }
+.family-switch-arrow { color: #a5aea6; }
